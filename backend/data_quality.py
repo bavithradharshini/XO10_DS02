@@ -1,64 +1,105 @@
+import os
 import pandas as pd
+try:
+    from backend.data_inspection import load_dataset, detect_columns
+except ImportError:
+    from data_inspection import load_dataset, detect_columns
 
-DATA_PATH = "/workspaces/XO10_DS02/development_train.csv"
 
-# Load dataset
-df = pd.read_csv(DATA_PATH)
+def analyze_data_quality(df, sensor_columns=None):
+    if sensor_columns is None:
+        detected = detect_columns(df)
+        sensor_columns = detected["sensor_cols"]
 
-# Convert timestamp
-df["Timestamp"] = pd.to_datetime(df["Timestamp"])
+    total_records = len(df)
+    duplicates = int(df.duplicated().sum())
 
-# Sensor columns
-sensor_columns = [
-    "CO_Channel",
-    "NOx_Channel",
-    "NO2_Channel",
-    "Ambient_Temperature",
-    "Relative_Humidity",
-    "Absolute_Humidity"
-]
+    missing_values = {}
+    missing_pct = {}
+    negative_values = {}
+    sensor_ranges = {}
 
-print("=" * 60)
-print("SENTINEL - DATA QUALITY ANALYZER")
-print("=" * 60)
+    total_cells = total_records * max(1, len(sensor_columns))
+    total_missing = 0
+    total_negatives = 0
 
-# 1. Missing values
-print("\n[1] MISSING VALUES")
+    for col in sensor_columns:
+        if col in df.columns:
+            m = int(df[col].isna().sum())
+            missing_values[col] = m
+            missing_pct[col] = round((m / total_records) * 100, 2) if total_records > 0 else 0
+            total_missing += m
 
-for column in sensor_columns:
-    missing = df[column].isna().sum()
+            neg = int((df[col] < 0).sum()) if pd.api.types.is_numeric_dtype(df[col]) else 0
+            negative_values[col] = neg
+            total_negatives += neg
 
-    print(f"{column:25} : {missing}")
+            col_clean = df[col].dropna()
+            if len(col_clean) > 0:
+                sensor_ranges[col] = {
+                    "min": round(float(col_clean.min()), 2),
+                    "max": round(float(col_clean.max()), 2),
+                    "mean": round(float(col_clean.mean()), 2),
+                    "std": round(float(col_clean.std()), 2)
+                }
+            else:
+                sensor_ranges[col] = {"min": None, "max": None, "mean": None, "std": None}
 
-# 2. Duplicate records
-print("\n[2] DUPLICATE RECORDS")
+    # Overall Quality Score out of 100
+    missing_ratio = (total_missing / max(1, total_cells))
+    quality_score = max(0, min(100, round(100 - (missing_ratio * 100 * 2) - (duplicates * 5), 1)))
 
-duplicates = df.duplicated().sum()
+    return {
+        "total_records": total_records,
+        "duplicate_records": duplicates,
+        "missing_values": missing_values,
+        "missing_percentage": missing_pct,
+        "negative_values": negative_values,
+        "sensor_ranges": sensor_ranges,
+        "overall_quality_score": quality_score,
+        "sensor_columns": sensor_columns
+    }
 
-print("Duplicate rows:", duplicates)
 
-# 3. Negative values
-print("\n[3] NEGATIVE SENSOR VALUES")
+if __name__ == "__main__":
+    df = load_dataset()
+    col_info = detect_columns(df)
+    if col_info["timestamp_col"] and col_info["timestamp_col"] in df.columns:
+        df[col_info["timestamp_col"]] = pd.to_datetime(df[col_info["timestamp_col"]])
 
-for column in sensor_columns:
-    negative = (df[column] < 0).sum()
+    sensor_columns = col_info["sensor_cols"]
+    results = analyze_data_quality(df, sensor_columns)
 
-    print(f"{column:25} : {negative}")
+    print("=" * 60)
+    print("SENTINEL - DATA QUALITY ANALYZER")
+    print("=" * 60)
 
-# 4. Basic range information
-print("\n[4] SENSOR RANGES")
+    # 1. Missing values
+    print("\n[1] MISSING VALUES")
+    for column in sensor_columns:
+        print(f"{column:25} : {results['missing_values'].get(column, 0)}")
 
-for column in sensor_columns:
+    # 2. Duplicate records
+    print("\n[2] DUPLICATE RECORDS")
+    print("Duplicate rows:", results["duplicate_records"])
 
-    minimum = df[column].min()
-    maximum = df[column].max()
+    # 3. Negative values
+    print("\n[3] NEGATIVE SENSOR VALUES")
+    for column in sensor_columns:
+        print(f"{column:25} : {results['negative_values'].get(column, 0)}")
 
-    print(
-        f"{column:25} : "
-        f"Min = {minimum:.2f}, "
-        f"Max = {maximum:.2f}"
-    )
+    # 4. Basic range information
+    print("\n[4] SENSOR RANGES")
+    for column in sensor_columns:
+        r = results["sensor_ranges"].get(column, {})
+        min_val = r.get("min", 0.0)
+        max_val = r.get("max", 0.0)
+        print(
+            f"{column:25} : "
+            f"Min = {min_val:.2f}, "
+            f"Max = {max_val:.2f}"
+        )
 
-print("\n" + "=" * 60)
-print("DATA QUALITY ANALYSIS COMPLETE")
-print("=" * 60)
+    print("\n" + "=" * 60)
+    print("DATA QUALITY ANALYSIS COMPLETE")
+    print("=" * 60)

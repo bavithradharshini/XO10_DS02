@@ -3,230 +3,2608 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SENTINEL - Environmental Sensor Intelligence, Trust Scoring, Drift Detection & Health Platform">
 
-    <title>SENTINEL | Sensor Intelligence</title>
+    <title>SENTINEL | Sensor Intelligence & Reliability Platform</title>
 
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
         }
 
         body {
             background: #0f172a;
-            color: white;
+            color: #f8fafc;
             padding: 30px;
+            line-height: 1.5;
         }
 
         header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
             margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         header h1 {
             font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         header p {
             color: #94a3b8;
-            margin-top: 8px;
+            margin-top: 6px;
+            font-size: 15px;
         }
 
-        .status {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 8px 15px;
-            border-radius: 20px;
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 9999px;
             background: #14532d;
             color: #86efac;
+            font-weight: 600;
+            font-size: 13px;
+            border: 1px solid #166534;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 8px #4ade80;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .cards {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
 
         .card {
             background: #1e293b;
-            padding: 25px;
-            border-radius: 15px;
+            padding: 22px;
+            border-radius: 14px;
             border: 1px solid #334155;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: #475569;
+            transform: translateY(-2px);
         }
 
         .card h3 {
             color: #94a3b8;
-            font-size: 15px;
-            margin-bottom: 12px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
         }
 
         .value {
-            font-size: 32px;
-            font-weight: bold;
+            font-size: 30px;
+            font-weight: 700;
+            color: #ffffff;
         }
 
+        .sub-value {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 6px;
+        }
+
+        /* Station Health Grid */
+        .stations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .station-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 14px;
+            padding: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .station-card:hover {
+            border-color: #38bdf8;
+            background-color: #243248;
+            transform: translateY(-2px);
+        }
+
+        .station-card.selected {
+            border-color: #38bdf8 !important;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4), inset 0 0 10px rgba(56, 189, 248, 0.15) !important;
+            background-color: #1e2e44 !important;
+            transform: translateY(-3px);
+        }
+
+        .station-card.selected .station-title {
+            color: #38bdf8;
+        }
+
+        .station-card .drill-hint {
+            font-size: 11px;
+            color: #38bdf8;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+        }
+
+        .drilldown-banner {
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .drilldown-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .drilldown-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #38bdf8;
+        }
+
+        .drilldown-btn {
+            background: #1e293b;
+            color: #f8fafc;
+            border: 1px solid #475569;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .drilldown-btn:hover {
+            background: #334155;
+            border-color: #94a3b8;
+        }
+
+        .station-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .station-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .pill-optimal, .pill-high {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .pill-good, .pill-medium {
+            background: rgba(234, 179, 8, 0.15);
+            color: #facc15;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+
+        .pill-degraded, .pill-low, .pill-critical {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .station-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 8px;
+        }
+
+        /* Two Column Layout for Alerts and Drift/Quality */
+        .grid-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-split {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: #1e293b;
+            padding: 24px;
+            border-radius: 14px;
+            border: 1px solid #334155;
+            max-height: 480px;
+            overflow-y: auto;
+        }
+
+        /* Alerts List */
+        .alert-item {
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #0f172a;
+            border-left: 4px solid #38bdf8;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .alert-item.critical {
+            border-left-color: #ef4444;
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .alert-item.warning {
+            border-left-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .alert-station {
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .alert-time {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .alert-msg {
+            color: #cbd5e1;
+            margin-bottom: 4px;
+        }
+
+        .alert-rec {
+            font-size: 11px;
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        /* Drift & Quality meters */
+        .drift-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #334155;
+            font-size: 13px;
+        }
+
+        .drift-row:last-child {
+            border-bottom: none;
+        }
+
+        .drift-sensor-name {
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        /* Table Container */
         .table-container {
             background: #1e293b;
-            padding: 25px;
-            border-radius: 15px;
+            padding: 24px;
+            border-radius: 14px;
             border: 1px solid #334155;
             overflow-x: auto;
+        }
+
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        select {
+            background: #0f172a;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
 
         th, td {
-            padding: 14px;
+            padding: 12px 14px;
             text-align: left;
             border-bottom: 1px solid #334155;
+            font-size: 13px;
         }
 
         th {
             color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
         }
 
-        .high {
-            color: #4ade80;
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
         }
 
-        .medium {
-            color: #facc15;
+        .score-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .low {
+        .reason-text {
+            color: #94a3b8;
+            font-size: 12px;
+            max-width: 320px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Modal Styles for Trust Score Breakdown */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.82);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.2s ease-out;
+            padding: 20px;
+        }
+
+        .modal-container {
+            background: #1e293b;
+            border: 1px solid #38bdf8;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 30px rgba(56, 189, 248, 0.25);
+            border-radius: 16px;
+            max-width: 640px;
+            width: 100%;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background: #141e30;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-subtitle {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .modal-close-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #475569;
+            color: #94a3b8;
+            font-size: 16px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
             color: #f87171;
+            transform: rotate(90deg);
         }
 
-        @media (max-width: 700px) {
-            .cards {
-                grid-template-columns: 1fr;
-            }
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+
+        .score-summary-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .score-metric {
+            text-align: center;
+        }
+
+        .score-metric-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .score-metric-val {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .deductions-list {
+            margin-top: 16px;
+        }
+
+        .deduction-card {
+            background: #0f172a;
+            border-left: 4px solid #ef4444;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .deduction-card.warning-factor {
+            border-left-color: #f59e0b;
+        }
+
+        .deduction-reason-text {
+            color: #e2e8f0;
+            font-size: 13px;
+        }
+
+        .deduction-penalty-badge {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .no-deductions-banner {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #4ade80;
+            padding: 16px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .sensor-snapshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .sensor-snapshot-item {
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            text-align: center;
+        }
+
+        .sensor-snapshot-item .s-name {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .sensor-snapshot-item .s-val {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f8fafc;
+            margin-top: 2px;
+        }
+
+        /* Clickable score styles */
+        .clickable-score {
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+            position: relative;
+            text-decoration: underline dotted rgba(56, 189, 248, 0.6);
+        }
+
+        .clickable-score:hover {
+            color: #38bdf8 !important;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+            transform: scale(1.03);
+            text-decoration: underline solid #38bdf8;
+        }
+
+        .clickable-score::after {
+            content: "🔍";
+            font-size: 10px;
+            opacity: 0.6;
+        }
+
+        .clickable-score:hover::after {
+            opacity: 1;
+        }
+
+        .alert-inspect-btn {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #38bdf8;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .alert-inspect-btn:hover {
+            background: rgba(56, 189, 248, 0.3);
+            border-color: #38bdf8;
+            color: #ffffff;
+        }
+
+        /* Upload Button & Toast Notifications */
+        .upload-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 13px;
+            border: 1px solid #38bdf8;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+        }
+
+        .upload-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.45);
+            transform: translateY(-1px);
+        }
+
+        .upload-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 420px;
+        }
+
+        .toast {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+            color: #f8fafc;
+            font-size: 13px;
+            animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.3s ease;
+        }
+
+        .toast.success {
+            border-left: 4px solid #4ade80;
+            background: #0f241a;
+        }
+
+        .toast.error {
+            border-left: 4px solid #f87171;
+            background: #2a1215;
+        }
+
+        .toast.info {
+        /* =========================================================
+           Advanced Feature A & B Intelligence Styles
+           ========================================================= */
+        .pill-valid-event {
+            background: rgba(249, 115, 22, 0.2);
+            color: #fb923c;
+            border: 1px solid rgba(249, 115, 22, 0.5);
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.25);
+        }
+
+        .pill-unreliable {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
+        }
+
+        .pill-drift-detected {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+        }
+
+        .pill-no-drift {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.35);
+        }
+
+        .filter-chip {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            padding: 5px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-chip:hover {
+            border-color: #38bdf8;
+            color: #f8fafc;
+        }
+
+        .filter-chip.active {
+            background: #0284c7;
+            color: #ffffff;
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+        }
+
+        .ctrl-select {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #f8fafc;
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        .ctrl-select:focus {
+            border-color: #38bdf8;
+        }
+
+        .classified-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .classified-card:hover {
+            border-color: #475569;
+            transform: translateY(-1px);
+            background: #131f33;
+        }
+
+        .classified-card.valid-event {
+            border-left: 4px solid #f97316;
+        }
+
+        .classified-card.unreliable {
+            border-left: 4px solid #ef4444;
+        }
+
+        .drift-channel-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 14px 16px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .drift-channel-card:hover {
+            border-color: #38bdf8;
+            transform: translateY(-1px);
+            background: #131f33;
+        }
+
+        .drift-channel-card.drifting {
+            border-left: 4px solid #facc15;
+        }
+
+        .drift-channel-card.stable {
+            border-left: 4px solid #4ade80;
+        }
+
+        .chart-tooltip {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid #38bdf8;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 11px;
+            color: #f8fafc;
+            pointer-events: none;
+            z-index: 100;
+            white-space: nowrap;
+        }
+
+        .evidence-card-modal {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+        }
+
+        .evidence-card-modal .ev-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #94a3b8;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .evidence-card-modal .ev-text {
+            color: #e2e8f0;
+            font-size: 13px;
+            line-height: 1.4;
         }
     </style>
 </head>
 
 <body>
 
-    <header>
-        <h1>🛡️ SENTINEL</h1>
-        <p>Environmental Sensor Intelligence & Reliability Platform</p>
+    <div id="toast-container" class="toast-container"></div>
 
-        <div class="status">
-            ● SYSTEM ONLINE
+    <header>
+        <div>
+            <h1>🛡️ SENTINEL</h1>
+            <p>Environmental Sensor Intelligence & Data Reliability Platform</p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <input type="file" id="csv-file-input" accept=".csv" style="display: none;" onchange="handleFileUpload(event)">
+            <button id="upload-btn" class="upload-btn" onclick="document.getElementById('csv-file-input').click()" title="Upload a new multi-channel telemetry CSV for instant re-analysis">
+                <span id="upload-btn-icon">📁</span>
+                <span id="upload-btn-text">Upload New CSV</span>
+            </button>
+
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                <span id="system-status">SYSTEM ONLINE</span>
+            </div>
         </div>
     </header>
 
+    <!-- Top Key Metrics Cards -->
     <section class="cards">
-
         <div class="card">
             <h3>Total Records</h3>
             <div class="value" id="records">Loading...</div>
+            <div class="sub-value">Observed Data Points</div>
         </div>
 
         <div class="card">
             <h3>Monitoring Stations</h3>
             <div class="value" id="stations">Loading...</div>
+            <div class="sub-value" id="stations-sub">Active Sensor Sites</div>
         </div>
 
         <div class="card">
             <h3>Sensor Channels</h3>
             <div class="value" id="sensors">Loading...</div>
+            <div class="sub-value">Multi-Channel Telemetry</div>
         </div>
 
+        <div class="card">
+            <h3>Average Trust Score</h3>
+            <div class="value clickable-score" id="avg-trust" onclick="openPlatformScoreModal()" title="Click to inspect platform-wide trust score breakdown">--</div>
+            <div class="sub-value" id="trust-dist">Calculating...</div>
+        </div>
+
+        <div class="card">
+            <h3>System Drift Status</h3>
+            <div class="value" id="drift-status" style="font-size: 20px;">--</div>
+            <div class="sub-value" id="drift-sub">Baseline Stability</div>
+        </div>
+
+        <div class="card">
+            <h3>Active Alerts</h3>
+            <div class="value" id="alert-count" style="color: #f87171;">--</div>
+            <div class="sub-value" id="alert-crit-sub">Critical / Warnings</div>
+        </div>
     </section>
 
-    <section class="table-container">
+    <!-- Station Health Overview -->
+    <h2 class="section-title">📡 Station Health Scores</h2>
+    <section class="stations-grid" id="stations-grid">
+        <div style="color: #94a3b8; padding: 20px;">Loading station health status...</div>
+    </section>
 
-        <h2>Recent Sensor Readings</h2>
+    <!-- Station Drill-Down Banner -->
+    <div id="drilldown-banner" class="drilldown-banner" style="display: none;">
+        <div class="drilldown-info">
+            <span class="drilldown-title" id="drilldown-station-name">📍 Station Drill-Down: STN-01</span>
+            <span id="drilldown-status-pill" class="pill pill-optimal">OPTIMAL</span>
+            <span style="color: #cbd5e1; font-size: 13px;" id="drilldown-desc">Drill-down active — showing filtered alerts, drift calibration, and recent telemetry</span>
+        </div>
+        <button class="drilldown-btn" onclick="clearStationFilter()">✕ Reset Filter (Show All Stations)</button>
+    </div>
+
+    <!-- Mid Panel: Active Alerts & Sensor Drift / Quality -->
+    <div class="grid-split">
+        <section class="panel">
+            <h2 class="section-title" id="alerts-panel-title">⚠️ Real-Time Sensor Alerts</h2>
+            <div id="alerts-container">
+                <div style="color: #94a3b8;">Loading alerts...</div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title" id="drift-panel-title">📈 Sensor Calibration & Drift</h2>
+            <div id="drift-container">
+                <div style="color: #94a3b8;">Loading drift analysis...</div>
+            </div>
+        </section>
+    </div>
+
+    <!-- =========================================================
+         ADVANCED ANALYTICS SECTION: False Alarm Classifier & Measurement Drift Intelligence
+         ========================================================= -->
+    <section id="advanced-analytics-section" style="margin-bottom: 35px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px; margin-bottom: 16px;">
+            <div>
+                <h2 class="section-title" style="margin-bottom: 4px;">
+                    🔬 Advanced Sensor Intelligence: False Alarms & Structural Drift
+                </h2>
+                <p style="color: #94a3b8; font-size: 14px;">
+                    Explainable multi-signal diagnostics distinguishing genuine extreme atmospheric events from hardware faults, and CUSUM change-point drift tracking.
+                </p>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                <div>
+                    <label for="adv-station-select" style="font-size: 12px; color: #94a3b8; margin-right: 6px;">Station:</label>
+                    <select id="adv-station-select" class="ctrl-select" onchange="handleAdvStationChange(this.value)">
+                        <option value="">All Stations</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="adv-channel-select" style="font-size: 12px; color: #94a3b8; margin-right: 6px;">Channel:</label>
+                    <select id="adv-channel-select" class="ctrl-select" onchange="handleAdvChannelChange(this.value)">
+                        <!-- Populated dynamically from sensor columns -->
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Time Series Chart Card: Normal vs Valid Extreme vs Unreliable Readings & Drift Marker -->
+        <div class="card" style="padding: 22px; margin-bottom: 22px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-weight: 700; font-size: 16px; color: #f1f5f9;" id="adv-chart-title">
+                        Telemetry Observations & Extreme Event Classification
+                    </span>
+                    <span id="adv-channel-drift-badge" class="pill pill-no-drift">ANALYZING...</span>
+                </div>
+
+                <!-- Color Legend for Evaluations -->
+                <div class="chart-legend" style="display: flex; align-items: center; gap: 16px; font-size: 12px; color: #cbd5e1; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #38bdf8; display: inline-block;"></span>
+                        <span>Normal Reading</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="width: 12px; height: 12px; border-radius: 50%; background: #f97316; display: inline-block; box-shadow: 0 0 10px #f97316;"></span>
+                        <span style="color: #fb923c; font-weight: 600;">Valid Extreme Event (Orange)</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444; display: inline-block; box-shadow: 0 0 10px #ef4444;"></span>
+                        <span style="color: #f87171; font-weight: 600;">Unreliable Reading / Fault (Red)</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="width: 18px; height: 2px; border-top: 2px dashed #facc15; display: inline-block;"></span>
+                        <span style="color: #facc15; font-weight: 600;">Drift Start Point</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas Container -->
+            <div style="position: relative; width: 100%; height: 320px; background: #0b1120; border-radius: 12px; border: 1px solid #1e293b; overflow: hidden;" id="adv-canvas-container">
+                <canvas id="adv-analytics-canvas" style="width: 100%; height: 100%; display: block;"></canvas>
+                <div id="adv-chart-tooltip" class="chart-tooltip" style="display: none;"></div>
+            </div>
+
+            <!-- Dynamic footer info bar for drift changepoint and stats -->
+            <div id="adv-drift-callout" style="margin-top: 12px; font-size: 13px; color: #94a3b8; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <span id="adv-drift-callout-text">Loading drift and changepoint statistics...</span>
+                <span id="adv-drift-points-legend" style="font-size: 11px; color: #64748b;">Tip: Click any highlighted extreme point or channel card to inspect full statistical evidence.</span>
+            </div>
+        </div>
+
+        <!-- Two Column Explorer: Left = False Alarm Classifications, Right = Measurement Drift Evidence -->
+        <div class="grid-split" style="margin-bottom: 0;">
+            <!-- Left: Flagged Extreme Observations List (Feature A) -->
+            <div class="panel" style="max-height: 480px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <h3 style="font-size: 16px; font-weight: 700; color: #f8fafc;">
+                            ⚡ Flagged Extreme Observations
+                        </h3>
+                        <div id="classified-summary-text" style="font-size: 12px; color: #94a3b8; margin-top: 2px;">
+                            Classified via cross-sensor agreement, rate of change, and local statistics
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 6px;">
+                        <button class="filter-chip active" id="chip-all" onclick="filterClassifications('ALL')">All</button>
+                        <button class="filter-chip" id="chip-valid" onclick="filterClassifications('VALID_EXTREME_EVENT')">Valid Events</button>
+                        <button class="filter-chip" id="chip-unreliable" onclick="filterClassifications('UNRELIABLE_READING')">Unreliable</button>
+                    </div>
+                </div>
+
+                <div id="classified-list-container" style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="color: #94a3b8; padding: 20px; text-align: center;">Loading flagged observations...</div>
+                </div>
+            </div>
+
+            <!-- Right: Measurement Drift Intelligence Overview (Feature B) -->
+            <div class="panel" style="max-height: 480px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <h3 style="font-size: 16px; font-weight: 700; color: #f8fafc;">
+                            📈 Measurement Drift & Structural Break
+                        </h3>
+                        <div id="drift-summary-text" style="font-size: 12px; color: #94a3b8; margin-top: 2px;">
+                            Rolling statistics, trend slope, baseline shift & CUSUM changepoint detection
+                        </div>
+                    </div>
+                    <span id="drift-overall-pill" class="pill pill-optimal">SYSTEM STABLE</span>
+                </div>
+
+                <div id="drift-channels-container" style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="color: #94a3b8; padding: 20px; text-align: center;">Loading drift telemetry...</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Sensor Readings Table with Trust Engine Details -->
+    <section class="table-container" id="readings-section">
+        <div class="table-controls">
+            <h2 class="section-title" id="readings-panel-title" style="margin-bottom: 0;">📊 Observation Trust & Sensor Telemetry</h2>
+            <div>
+                <label for="station-filter" style="font-size: 13px; color: #94a3b8; margin-right: 8px;">Filter Station:</label>
+                <select id="station-filter" onchange="handleFilterChange(this.value)">
+                    <option value="">All Stations</option>
+                </select>
+            </div>
+        </div>
 
         <table>
             <thead>
-                <tr>
+                <tr id="table-header-row">
                     <th>Station</th>
                     <th>Timestamp</th>
                     <th>CO</th>
                     <th>NOx</th>
                     <th>NO2</th>
+                    <th>Temp (°C)</th>
+                    <th>Trust Score</th>
+                    <th>Reliability</th>
+                    <th>Explainability / Deductions</th>
                 </tr>
             </thead>
 
             <tbody id="readings">
                 <tr>
-                    <td colspan="5">Loading sensor data...</td>
+                    <td colspan="9">Loading sensor data...</td>
                 </tr>
             </tbody>
-
         </table>
-
     </section>
-
-
+ 
+    <!-- Trust Score Breakdown Modal -->
+    <div id="trust-modal-overlay" class="modal-overlay" onclick="handleModalOverlayClick(event)" style="display: none;">
+        <div class="modal-container" id="trust-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title" id="modal-title">🛡️ Trust Score Breakdown</h2>
+                    <div class="modal-subtitle" id="modal-subtitle">Explainable Factor Deductions</div>
+                </div>
+                <button class="modal-close-btn" onclick="closeTrustModal()" aria-label="Close modal">✕</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Content dynamically populated by openReadingScoreModal / openStationScoreModal -->
+            </div>
+        </div>
+    </div>
+ 
     <script>
+        // Connect to API (dynamically adapt if served by Flask or static server)
+        const API = (window.location.protocol === "http:" || window.location.protocol === "https:") && window.location.port === "5001"
+            ? ""
+            : "http://127.0.0.1:5001";
 
-        const API = "PASTE_THE_5001_FORWARD_ADDRESS_HERE";
+        // Track active sensor channels dynamically
+        let currentSensorColumns = [];
 
-        // Load summary
-        fetch(`${API}/api/summary`)
-            .then(response => response.json())
-            .then(data => {
+        // Helper to format values
+        function formatVal(val) {
+            return (val !== null && val !== undefined) ? Number(val).toFixed(2) : "--";
+        }
 
-                document.getElementById("records").textContent =
-                    data.total_records;
+        // 1. Load System Summary
+        function loadSummary() {
+            fetch(`${API}/api/summary`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.sensor_names) {
+                        currentSensorColumns = data.sensor_names;
+                    }
+                    document.getElementById("records").textContent = Number(data.total_records).toLocaleString();
+                    document.getElementById("stations").textContent = data.stations;
+                    document.getElementById("sensors").textContent = data.sensors;
 
-                document.getElementById("stations").textContent =
-                    data.stations;
+                    if (data.average_trust_score !== undefined) {
+                        document.getElementById("avg-trust").textContent = data.average_trust_score + "/100";
+                    }
 
-                document.getElementById("sensors").textContent =
-                    data.sensors;
+                    if (data.reliability_distribution) {
+                        const dist = data.reliability_distribution;
+                        document.getElementById("trust-dist").textContent =
+                            `High: ${dist.HIGH || 0} | Med: ${dist.MEDIUM || 0} | Low: ${dist.LOW || 0}`;
+                    }
 
-            })
-            .catch(error => {
-                console.error("API Error:", error);
+                    if (data.system_drift_status) {
+                        const ds = document.getElementById("drift-status");
+                        ds.textContent = data.system_drift_status.replace(/_/g, " ");
+                        if (data.system_drift_status.includes("CRITICAL")) {
+                            ds.style.color = "#f87171";
+                        } else if (data.system_drift_status.includes("MODERATE")) {
+                            ds.style.color = "#facc15";
+                        } else {
+                            ds.style.color = "#4ade80";
+                        }
+                    }
+
+                    // Populate station filter dropdown
+                    if (data.station_names) {
+                        const sel = document.getElementById("station-filter");
+                        const advStnSel = document.getElementById("adv-station-select");
+                        const current = sel.value;
+                        const advCurrent = advStnSel ? advStnSel.value : "";
+                        sel.innerHTML = '<option value="">All Stations</option>';
+                        if (advStnSel) advStnSel.innerHTML = '<option value="">All Stations</option>';
+
+                        data.station_names.forEach(stn => {
+                            const opt = document.createElement("option");
+                            opt.value = stn;
+                            opt.textContent = stn;
+                            if (stn === current) opt.selected = true;
+                            sel.appendChild(opt);
+
+                            if (advStnSel) {
+                                const advOpt = document.createElement("option");
+                                advOpt.value = stn;
+                                advOpt.textContent = stn;
+                                if (stn === advCurrent) advOpt.selected = true;
+                                advStnSel.appendChild(advOpt);
+                            }
+                        });
+                    }
+                })
+                .catch(err => console.error("Summary error:", err));
+        }
+
+        // Station Drill-Down State
+        let currentSelectedStation = null;
+        let cachedStations = [];
+
+        function selectStation(stationId) {
+            if (currentSelectedStation === stationId) {
+                clearStationFilter();
+                return;
+            }
+            currentSelectedStation = stationId;
+
+            // Highlight selected station card with visual glow
+            document.querySelectorAll(".station-card").forEach(card => {
+                if (card.dataset.stationId === stationId) {
+                    card.classList.add("selected");
+                } else {
+                    card.classList.remove("selected");
+                }
             });
 
+            // Update station filter dropdown
+            const sel = document.getElementById("station-filter");
+            if (sel) sel.value = stationId;
 
-        // Load readings
-        fetch(`${API}/api/readings`)
-            .then(response => response.json())
-            .then(data => {
+            const advStnSel = document.getElementById("adv-station-select");
+            if (advStnSel) advStnSel.value = stationId || "";
 
-                const table = document.getElementById("readings");
+            // Update and display drill-down banner
+            const banner = document.getElementById("drilldown-banner");
+            const stnObj = cachedStations.find(s => s.station_id === stationId);
+            if (banner) {
+                banner.style.display = "flex";
+                document.getElementById("drilldown-station-name").textContent = `📍 Station Drill-Down: ${stationId}`;
 
-                table.innerHTML = "";
+                if (stnObj) {
+                    const pill = document.getElementById("drilldown-status-pill");
+                    pill.className = "pill " + (stnObj.status === "OPTIMAL" ? "pill-optimal" : (stnObj.status === "GOOD" ? "pill-good" : "pill-degraded"));
+                    pill.textContent = `${stnObj.health_score}/100 (${stnObj.status})`;
+                    document.getElementById("drilldown-desc").textContent =
+                        `Drill-down active — showing active alerts (${stnObj.active_alerts}), drift calibration, and recent telemetry for ${stationId}`;
+                }
+            }
 
-                data.forEach(row => {
+            // Update panel titles
+            const alertsTitle = document.getElementById("alerts-panel-title");
+            if (alertsTitle) alertsTitle.textContent = `⚠️ Active Alerts (${stationId})`;
 
-                    const tr = document.createElement("tr");
+            const driftTitle = document.getElementById("drift-panel-title");
+            if (driftTitle) driftTitle.textContent = `📈 Sensor Drift (${stationId})`;
 
-                    tr.innerHTML = `
-                        <td>${row.Station_ID}</td>
-                        <td>${row.Timestamp}</td>
-                        <td>${row.CO_Channel}</td>
-                        <td>${row.NOx_Channel}</td>
-                        <td>${row.NO2_Channel}</td>
+            const readingsTitle = document.getElementById("readings-panel-title");
+            if (readingsTitle) readingsTitle.textContent = `📊 Telemetry & Trust Scores (${stationId})`;
+
+            // Fetch filtered data across all components using existing endpoints
+            loadAlerts(stationId);
+            loadDrift(stationId);
+            loadReadings(stationId);
+            if (typeof loadAdvancedAnalytics === "function") {
+                loadAdvancedAnalytics(stationId);
+            }
+
+            // Smoothly scroll down to drill-down section
+            setTimeout(() => {
+                if (banner) {
+                    banner.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+            }, 100);
+        }
+
+        function clearStationFilter() {
+            currentSelectedStation = null;
+            document.querySelectorAll(".station-card").forEach(card => card.classList.remove("selected"));
+
+            const sel = document.getElementById("station-filter");
+            if (sel) sel.value = "";
+
+            const advStnSel = document.getElementById("adv-station-select");
+            if (advStnSel) advStnSel.value = "";
+
+            const banner = document.getElementById("drilldown-banner");
+            if (banner) banner.style.display = "none";
+
+            const alertsTitle = document.getElementById("alerts-panel-title");
+            if (alertsTitle) alertsTitle.textContent = "⚠️ Real-Time Sensor Alerts";
+
+            const driftTitle = document.getElementById("drift-panel-title");
+            if (driftTitle) driftTitle.textContent = "📈 Sensor Calibration & Drift";
+
+            const readingsTitle = document.getElementById("readings-panel-title");
+            if (readingsTitle) readingsTitle.textContent = "📊 Observation Trust & Sensor Telemetry";
+
+            loadAlerts();
+            loadDrift();
+            loadReadings();
+            if (typeof loadAdvancedAnalytics === "function") {
+                loadAdvancedAnalytics(null);
+            }
+        }
+
+        function handleFilterChange(value) {
+            if (value) {
+                selectStation(value);
+            } else {
+                clearStationFilter();
+            }
+        }
+
+        // 2. Load Station Health
+        function loadStations() {
+            fetch(`${API}/api/stations`)
+                .then(res => res.json())
+                .then(stations => {
+                    cachedStations = stations;
+                    const grid = document.getElementById("stations-grid");
+                    grid.innerHTML = "";
+
+                    stations.forEach(stn => {
+                        const pillClass = stn.status === "OPTIMAL" ? "pill-optimal" :
+                                          stn.status === "GOOD" ? "pill-good" : "pill-degraded";
+
+                        const card = document.createElement("div");
+                        card.className = "station-card" + (currentSelectedStation === stn.station_id ? " selected" : "");
+                        card.dataset.stationId = stn.station_id;
+                        card.onclick = () => selectStation(stn.station_id);
+
+                        card.innerHTML = `
+                            <div class="station-header">
+                                <span class="station-title">${stn.station_id}</span>
+                                <span class="pill ${pillClass}">${stn.status}</span>
+                            </div>
+                            <div style="font-size: 26px; font-weight: 700; color: #ffffff; margin-bottom: 4px;">
+                                <span class="clickable-score" onclick="openStationScoreModal(event, '${stn.station_id}')" title="Click to view trust score breakdown for ${stn.station_id}">
+                                    ${stn.health_score} <span style="font-size: 14px; color: #94a3b8;">/100</span>
+                                </span>
+                            </div>
+                            <div class="station-stats">
+                                <span>Avg Trust: <strong class="clickable-score" onclick="openStationScoreModal(event, '${stn.station_id}')" title="Click to view trust score breakdown for ${stn.station_id}">${stn.average_trust_score}</strong></span>
+                                <span>Readings: <strong>${stn.total_readings.toLocaleString()}</strong></span>
+                            </div>
+                            <div class="station-stats">
+                                <span>Alerts: <strong style="color: ${stn.active_alerts > 0 ? '#f87171' : '#4ade80'}">${stn.active_alerts}</strong></span>
+                                <span>Low Trust Obs: <strong>${stn.reliability_distribution.LOW}</strong></span>
+                            </div>
+                            <div class="drill-hint">🔍 Click card to drill down into ${stn.station_id}</div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                })
+                .catch(err => console.error("Stations error:", err));
+        }
+
+        // 3. Load Alerts
+        function loadAlerts(stationId = null) {
+            const targetStation = stationId !== null ? stationId : currentSelectedStation;
+            let url = `${API}/api/alerts`;
+            if (targetStation) {
+                url += `?station_id=${encodeURIComponent(targetStation)}`;
+            }
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById("alerts-container");
+                    const summary = data.summary;
+
+                    if (!targetStation) {
+                        document.getElementById("alert-count").textContent = summary.total_alerts;
+                        document.getElementById("alert-crit-sub").textContent =
+                            `${summary.critical_count} Critical, ${summary.warning_count} Warnings`;
+                    }
+
+                    container.innerHTML = "";
+
+                    if (!data.alerts || data.alerts.length === 0) {
+                        container.innerHTML = `<div style='color: #4ade80; padding: 14px; background: rgba(34, 197, 94, 0.08); border-radius: 8px;'>✓ No active alerts for ${targetStation || 'the platform'}. All channels nominal.</div>`;
+                        return;
+                    }
+
+                    data.alerts.slice(0, 8).forEach(alt => {
+                        const item = document.createElement("div");
+                        const sevClass = alt.severity === "CRITICAL" ? "critical" : "warning";
+
+                        item.className = `alert-item ${sevClass}`;
+                        item.innerHTML = `
+                            <div class="alert-header">
+                                <span class="alert-station">[${alt.severity}] ${alt.station_id} - ${alt.category.replace(/_/g, " ")}</span>
+                                <span class="alert-time">${alt.timestamp}</span>
+                            </div>
+                            <div class="alert-msg">${alt.message}</div>
+                            <div class="alert-rec">Action: ${alt.recommendation}</div>
+                            ${alt.row_index !== undefined ? `
+                                <div style="margin-top: 8px;">
+                                    <button class="alert-inspect-btn" onclick="openReadingScoreModal(${alt.row_index})">
+                                        🔍 Inspect Trust Breakdown (${alt.trust_score !== undefined ? alt.trust_score + '/100' : 'Score'})
+                                    </button>
+                                </div>
+                            ` : ''}
+                        `;
+                        container.appendChild(item);
+                    });
+                })
+                .catch(err => console.error("Alerts error:", err));
+        }
+
+        // 4. Load Drift
+        function loadDrift(stationId = null) {
+            const targetStation = stationId !== null ? stationId : currentSelectedStation;
+            let url = `${API}/api/drift`;
+            if (targetStation) {
+                url += `?station_id=${encodeURIComponent(targetStation)}`;
+            }
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById("drift-container");
+                    container.innerHTML = "";
+
+                    const sensors = data.sensors || {};
+                    const sensorKeys = Object.keys(sensors);
+
+                    if (sensorKeys.length === 0) {
+                        container.innerHTML = `<div style='color: #94a3b8; padding: 12px;'>No drift telemetry available for ${targetStation || 'selected scope'}.</div>`;
+                        return;
+                    }
+
+                    // Scope indicator
+                    const scopeInfo = document.createElement("div");
+                    scopeInfo.style.cssText = "font-size: 12px; color: #94a3b8; margin-bottom: 12px; display: flex; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 8px;";
+                    const statusColor = data.overall_status.includes("CRITICAL") ? "#f87171" : (data.overall_status.includes("MODERATE") ? "#facc15" : "#4ade80");
+                    scopeInfo.innerHTML = `<span>Scope: <strong style='color: #f8fafc;'>${targetStation || 'Entire Platform'}</strong> (${Number(data.analyzed_records).toLocaleString()} observations)</span><span>Status: <strong style='color:${statusColor};'>${data.overall_status.replace(/_/g, " ")}</strong></span>`;
+                    container.appendChild(scopeInfo);
+
+                    sensorKeys.forEach(sensorName => {
+                        const s = sensors[sensorName];
+                        const pillClass = s.drift_status === "STABLE" ? "pill-optimal" :
+                                          s.drift_status === "MODERATE_DRIFT" ? "pill-good" : "pill-degraded";
+
+                        const row = document.createElement("div");
+                        row.className = "drift-row";
+                        row.innerHTML = `
+                            <div>
+                                <div class="drift-sensor-name">${sensorName}</div>
+                                <div style="font-size: 11px; color: #94a3b8;">
+                                    Shift: ${s.mean_shift > 0 ? "+" : ""}${s.mean_shift} (${s.percentage_change > 0 ? "+" : ""}${s.percentage_change}%) • Z=${s.shift_zscore > 0 ? "+" : ""}${s.shift_zscore}
+                                </div>
+                            </div>
+                            <div>
+                                <span class="pill ${pillClass}">${s.drift_status.replace(/_/g, " ")}</span>
+                            </div>
+                        `;
+                        container.appendChild(row);
+                    });
+                })
+                .catch(err => console.error("Drift error:", err));
+        }
+
+        // 5. Load Readings Table
+        function loadReadings(stationId = null) {
+            const filterStn = stationId !== null ? stationId : document.getElementById("station-filter").value;
+            let url = `${API}/api/readings?limit=25`;
+            if (filterStn) {
+                url += `&station_id=${encodeURIComponent(filterStn)}`;
+            }
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    const table = document.getElementById("readings");
+                    const headerRow = document.getElementById("table-header-row");
+                    table.innerHTML = "";
+
+                    if (!data || data.length === 0) {
+                        const totalCols = (currentSensorColumns.length || 4) + 5;
+                        table.innerHTML = `<tr><td colspan='${totalCols}' style='text-align: center; color: #94a3b8; padding: 24px;'>No readings found for ${filterStn || 'selected scope'}.</td></tr>`;
+                        return;
+                    }
+
+                    // Dynamically detect sensor columns from summary or reading object
+                    const nonSensorKeys = new Set(['Station_ID', 'Timestamp', 'Trust_Score', 'Reliability', 'Deduction_Reasons', 'Deductions', 'row_index']);
+                    const sensorCols = (currentSensorColumns && currentSensorColumns.length > 0)
+                        ? currentSensorColumns
+                        : Object.keys(data[0]).filter(k => !nonSensorKeys.has(k));
+
+                    // Dynamically build table headers
+                    if (headerRow) {
+                        let headerHtml = `
+                            <th>Station</th>
+                            <th>Timestamp</th>
+                        `;
+                        sensorCols.forEach(sc => {
+                            headerHtml += `<th>${sc.replace(/_/g, " ")}</th>`;
+                        });
+                        headerHtml += `
+                            <th>Trust Score</th>
+                            <th>Reliability</th>
+                            <th>Explainability / Deductions</th>
+                        `;
+                        headerRow.innerHTML = headerHtml;
+                    }
+
+                    data.forEach(row => {
+                        const tr = document.createElement("tr");
+
+                        const score = row.Trust_Score !== undefined ? row.Trust_Score : "--";
+                        const rel = row.Reliability || "HIGH";
+                        const pillClass = rel === "HIGH" ? "pill-high" : (rel === "MEDIUM" ? "pill-medium" : "pill-low");
+                        const reasons = row.Deduction_Reasons || "Optimal confidence";
+
+                        let sensorCellsHtml = "";
+                        sensorCols.forEach(sc => {
+                            sensorCellsHtml += `<td>${formatVal(row[sc])}</td>`;
+                        });
+
+                        tr.innerHTML = `
+                            <td><strong>${row.Station_ID || "--"}</strong></td>
+                            <td style="color: #94a3b8; font-size: 12px;">${row.Timestamp || "--"}</td>
+                            ${sensorCellsHtml}
+                            <td>
+                                <div class="score-cell clickable-score" onclick="openReadingScoreModal(${row.row_index})" title="Click to view full mathematical trust score breakdown">
+                                    <strong style="font-size: 14px;">${score}</strong>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="pill ${pillClass}">${rel}</span>
+                            </td>
+                            <td>
+                                <div class="reason-text" title="${reasons}">
+                                    ${reasons}
+                                </div>
+                            </td>
+                        `;
+                        table.appendChild(tr);
+                    });
+                })
+                .catch(err => {
+                    document.getElementById("readings").innerHTML =
+                        "<tr><td colspan='9' style='color: #f87171;'>Unable to connect to SENTINEL API. Ensure the backend server is running on port 5001.</td></tr>";
+                    console.error("Readings error:", err);
+                });
+        }
+
+        // ==========================================
+        // Trust Score Breakdown Modal Controllers
+        // ==========================================
+
+        function openReadingScoreModal(rowIndex) {
+            if (rowIndex === undefined || rowIndex === null) return;
+            const modal = document.getElementById("trust-modal-overlay");
+            const modalBody = document.getElementById("modal-body");
+            const modalTitle = document.getElementById("modal-title");
+            const modalSubtitle = document.getElementById("modal-subtitle");
+
+            modalTitle.textContent = "🛡️ Trust Score Breakdown";
+            modalSubtitle.textContent = `Loading observation telemetry...`;
+            modalBody.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 30px;">Analyzing detector evidence from multi-channel telemetry...</div>`;
+            modal.style.display = "flex";
+
+            fetch(`${API}/api/trust/${rowIndex}/explain`)
+                .then(res => {
+                    if (!res.ok) throw new Error("Observation record not found");
+                    return res.json();
+                })
+                .then(data => {
+                    modalSubtitle.textContent = `Station: ${data.station_id} • Timestamp: ${data.timestamp} (Observation #${rowIndex})`;
+
+                    const pillClass = data.reliability === "HIGH" ? "pill-high" : (data.reliability === "MEDIUM" ? "pill-medium" : "pill-low");
+                    const scoreColor = data.reliability === "HIGH" ? "#4ade80" : (data.reliability === "MEDIUM" ? "#facc15" : "#f87171");
+
+                    let deductionsHtml = "";
+                    if (!data.deductions || data.deductions.length === 0) {
+                        deductionsHtml = `
+                            <div class="no-deductions-banner">
+                                ✓ 100% Signal Integrity — No statistical outliers, temporal spikes, missing channels, or cross-sensor conflicts detected.
+                            </div>
+                        `;
+                    } else {
+                        deductionsHtml = `<div class="deductions-list">
+                            <h4 style="font-size: 12px; text-transform: uppercase; color: #94a3b8; margin-bottom: 10px; letter-spacing: 0.5px;">Applied Deductions (${data.deductions.length})</h4>`;
+                        data.deductions.forEach(d => {
+                            const isSevere = Math.abs(d.penalty) >= 25;
+                            deductionsHtml += `
+                                <div class="deduction-card ${isSevere ? '' : 'warning-factor'}">
+                                    <div>
+                                        <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 2px;">
+                                            ${d.factor} • ${d.sensor}
+                                        </div>
+                                        <div class="deduction-reason-text">${d.reason}</div>
+                                    </div>
+                                    <span class="deduction-penalty-badge">${d.penalty} pts</span>
+                                </div>
+                            `;
+                        });
+                        deductionsHtml += `</div>`;
+                    }
+
+                    // Sensor readings snapshot
+                    let sensorSnapshotHtml = "";
+                    if (data.sensor_values && Object.keys(data.sensor_values).length > 0) {
+                        sensorSnapshotHtml = `
+                            <h4 style="font-size: 12px; text-transform: uppercase; color: #94a3b8; margin-top: 20px; margin-bottom: 8px; letter-spacing: 0.5px;">Sensor Channels Snapshot</h4>
+                            <div class="sensor-snapshot-grid">
+                        `;
+                        for (const [sName, sVal] of Object.entries(data.sensor_values)) {
+                            sensorSnapshotHtml += `
+                                <div class="sensor-snapshot-item">
+                                    <div class="s-name">${sName}</div>
+                                    <div class="s-val">${sVal !== null ? sVal : '<span style="color: #f87171;">NULL</span>'}</div>
+                                </div>
+                            `;
+                        }
+                        sensorSnapshotHtml += `</div>`;
+                    }
+
+                    modalBody.innerHTML = `
+                        <div class="score-summary-card">
+                            <div class="score-metric">
+                                <div class="score-metric-label">Base Score</div>
+                                <div class="score-metric-val" style="color: #4ade80;">100.0</div>
+                            </div>
+                            <div style="color: #64748b; font-size: 20px;">−</div>
+                            <div class="score-metric">
+                                <div class="score-metric-label">Total Penalty</div>
+                                <div class="score-metric-val" style="color: ${data.total_penalty < 0 ? '#f87171' : '#94a3b8'};">${Math.abs(data.total_penalty)} pts</div>
+                            </div>
+                            <div style="color: #64748b; font-size: 20px;">=</div>
+                            <div class="score-metric">
+                                <div class="score-metric-label">Final Trust Score</div>
+                                <div class="score-metric-val" style="color: ${scoreColor};">${data.final_score}</div>
+                            </div>
+                            <div class="score-metric">
+                                <div class="score-metric-label">Reliability</div>
+                                <div><span class="pill ${pillClass}">${data.reliability}</span></div>
+                            </div>
+                        </div>
+
+                        ${deductionsHtml}
+                        ${sensorSnapshotHtml}
                     `;
+                })
+                .catch(err => {
+                    modalBody.innerHTML = `<div style="color: #f87171; padding: 20px;">Failed to load breakdown: ${err.message}</div>`;
+                });
+        }
 
-                    table.appendChild(tr);
+        // Open modal for station breakdown
+        function openStationScoreModal(event, stationId) {
+            if (event) event.stopPropagation(); // Prevent toggling station drilldown
+            const modal = document.getElementById("trust-modal-overlay");
+            const modalBody = document.getElementById("modal-body");
+            const modalTitle = document.getElementById("modal-title");
+            const modalSubtitle = document.getElementById("modal-subtitle");
 
+            modalTitle.textContent = `📡 ${stationId} Trust Profile`;
+            modalSubtitle.textContent = `Station Aggregate Reliability Breakdown`;
+            modalBody.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 30px;">Loading station trust telemetry...</div>`;
+            modal.style.display = "flex";
+
+            fetch(`${API}/api/trust/explain?station_id=${encodeURIComponent(stationId)}`)
+                .then(res => res.json())
+                .then(data => {
+                    const dist = data.reliability_distribution || {};
+                    modalSubtitle.textContent = `${stationId} • Reliability: ${dist.HIGH || 0} High, ${dist.MEDIUM || 0} Medium, ${dist.LOW || 0} Low`;
+
+                    let factorsHtml = "";
+                    if (data.factor_summary) {
+                        factorsHtml = `
+                            <h4 style="font-size: 12px; text-transform: uppercase; color: #94a3b8; margin-top: 16px; margin-bottom: 8px; letter-spacing: 0.5px;">Anomaly Frequency By Detector</h4>
+                            <div class="sensor-snapshot-grid">
+                                <div class="sensor-snapshot-item">
+                                    <div class="s-name">Outliers</div>
+                                    <div class="s-val" style="color: #facc15;">${data.factor_summary["Statistical Outlier"] || 0}</div>
+                                </div>
+                                <div class="sensor-snapshot-item">
+                                    <div class="s-name">Temporal Spikes</div>
+                                    <div class="s-val" style="color: #facc15;">${data.factor_summary["Temporal Inconsistency"] || 0}</div>
+                                </div>
+                                <div class="sensor-snapshot-item">
+                                    <div class="s-name">Missing Data</div>
+                                    <div class="s-val" style="color: #f87171;">${data.factor_summary["Missing Data"] || 0}</div>
+                                </div>
+                                <div class="sensor-snapshot-item">
+                                    <div class="s-name">Cross-Sensor</div>
+                                    <div class="s-val" style="color: #38bdf8;">${data.factor_summary["Cross-Sensor Inconsistency"] || 0}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    let sampleLowestHtml = "";
+                    if (data.sample_lowest_readings && data.sample_lowest_readings.length > 0) {
+                        sampleLowestHtml = `
+                            <h4 style="font-size: 12px; text-transform: uppercase; color: #94a3b8; margin-top: 20px; margin-bottom: 8px; letter-spacing: 0.5px;">Lowest Scored Observations (Click to Inspect)</h4>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                        `;
+                        data.sample_lowest_readings.forEach(r => {
+                            const reasons = r.Deduction_Reasons || "Anomalous reading";
+                            sampleLowestHtml += `
+                                <div class="deduction-card" style="cursor: pointer;" onclick="openReadingScoreModal(${r.row_index})">
+                                    <div>
+                                        <div style="font-weight: 600; color: #f8fafc; font-size: 12px;">Timestamp: ${r.Timestamp || 'Observation'}</div>
+                                        <div class="deduction-reason-text">${reasons}</div>
+                                    </div>
+                                    <span class="deduction-penalty-badge" style="background: rgba(239, 68, 68, 0.3);">Score: ${r.Trust_Score} 🔍</span>
+                                </div>
+                            `;
+                        });
+                        sampleLowestHtml += `</div>`;
+                    }
+
+                    modalBody.innerHTML = `
+                        <div class="score-summary-card">
+                            <div class="score-metric">
+                                <div class="score-metric-label">Station</div>
+                                <div class="score-metric-val" style="color: #38bdf8;">${stationId}</div>
+                            </div>
+                            <div class="score-metric">
+                                <div class="score-metric-label">Avg Trust</div>
+                                <div class="score-metric-val" style="color: ${data.average_trust_score >= 80 ? '#4ade80' : '#facc15'};">${data.average_trust_score}/100</div>
+                            </div>
+                            <div class="score-metric">
+                                <div class="score-metric-label">High Trust Ratio</div>
+                                <div class="score-metric-val" style="color: #4ade80;">
+                                    ${Math.round(((dist.HIGH || 0) / ((dist.HIGH || 0) + (dist.MEDIUM || 0) + (dist.LOW || 0) || 1)) * 100)}%
+                                </div>
+                            </div>
+                        </div>
+                        ${factorsHtml}
+                        ${sampleLowestHtml}
+                    `;
+                })
+                .catch(err => {
+                    modalBody.innerHTML = `<div style="color: #f87171; padding: 20px;">Failed to load station profile: ${err.message}</div>`;
+                });
+        }
+
+        // Open modal for platform-wide breakdown
+        function openPlatformScoreModal() {
+            openStationScoreModal(null, "All Stations");
+        }
+
+        function closeTrustModal() {
+            const modal = document.getElementById("trust-modal-overlay");
+            if (modal) modal.style.display = "none";
+        }
+
+        function handleModalOverlayClick(event) {
+            if (event.target.id === "trust-modal-overlay") {
+                closeTrustModal();
+            }
+        }
+
+        // Close on ESC key
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeTrustModal();
+        });
+
+        // ==========================================
+        // Toast Notification System
+        // ==========================================
+
+        function showToast(message, type = "info", duration = 4500) {
+            const container = document.getElementById("toast-container");
+            if (!container) return;
+
+            const toast = document.createElement("div");
+            toast.className = `toast ${type}`;
+
+            const icon = type === "success" ? "✓" : (type === "error" ? "✕" : "ℹ");
+            toast.innerHTML = `
+                <span style="font-size: 16px; font-weight: 700;">${icon}</span>
+                <div style="flex: 1; line-height: 1.4;">${message}</div>
+                <button onclick="this.parentElement.remove()" style="background:none; border:none; color:#94a3b8; font-size:14px; cursor:pointer; padding: 0 4px;">✕</button>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.style.opacity = "0";
+                    toast.style.transform = "translateX(50px)";
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, duration);
+        }
+
+        // ==========================================
+        // Live CSV Upload & Re-Analysis Handler
+        // ==========================================
+
+        function handleFileUpload(event) {
+            const fileInput = event.target;
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const uploadBtn = document.getElementById("upload-btn");
+            const icon = document.getElementById("upload-btn-icon");
+            const text = document.getElementById("upload-btn-text");
+
+            // Set loading state
+            uploadBtn.disabled = true;
+            icon.textContent = "⏳";
+            text.textContent = "Analyzing Telemetry...";
+            showToast(`Uploading '${file.name}' and running multi-channel analysis pipeline...`, "info", 6000);
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            fetch(`${API}/api/upload`, {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.json().then(data => ({ status: res.status, body: data })))
+            .then(({ status, body }) => {
+                if (status >= 400 || body.error) {
+                    throw new Error(body.error || "Failed to analyze CSV file.");
+                }
+
+                showToast(`✓ ${body.message} Loaded ${Number(body.total_records).toLocaleString()} rows across ${body.stations_count} stations.`, "success", 5000);
+
+                // Reset any station drill-down filter
+                clearStationFilter();
+
+                // Re-render entire dashboard seamlessly
+                loadSummary();
+                loadStations();
+                loadAlerts();
+                loadDrift();
+                loadReadings();
+                loadAdvancedAnalytics();
+            })
+            .catch(err => {
+                showToast(`✕ Upload Error: ${err.message}`, "error", 7000);
+                console.error("Upload error:", err);
+            })
+            .finally(() => {
+                uploadBtn.disabled = false;
+                icon.textContent = "📁";
+                text.textContent = "Upload New CSV";
+                fileInput.value = ""; // Allow re-uploading the same file
+            });
+        }
+
+        // =========================================================
+        // FEATURE A & B: ADVANCED ANALYTICS CONTROLLERS
+        // False Alarm Classifier & Measurement Drift Visualizer
+        // =========================================================
+
+        let advCurrentChannel = null;
+        let advCurrentStation = null;
+        let advClassificationFilter = "ALL";
+        let cachedClassifications = [];
+        let cachedDriftAnalysis = null;
+        let cachedChartReadings = [];
+        let canvasHitBoxes = [];
+
+        function loadAdvancedAnalytics(stationId = null) {
+            advCurrentStation = stationId !== null ? stationId : (document.getElementById("adv-station-select") ? document.getElementById("adv-station-select").value : null);
+
+            // Sync station dropdown
+            const stnSelect = document.getElementById("adv-station-select");
+            if (stnSelect && stationId !== undefined) {
+                stnSelect.value = stationId || "";
+            }
+
+            // Fetch classifications
+            let classifyUrl = `${API}/api/classify?limit=150`;
+            if (advCurrentStation) {
+                classifyUrl += `&station_id=${encodeURIComponent(advCurrentStation)}`;
+            }
+
+            // Fetch drift analysis
+            let driftUrl = `${API}/api/drift/analysis`;
+            if (advCurrentStation) {
+                driftUrl += `?station_id=${encodeURIComponent(advCurrentStation)}`;
+            }
+
+            // Fetch readings for chart time series (limit 120)
+            let readingsUrl = `${API}/api/readings?limit=120`;
+            if (advCurrentStation) {
+                readingsUrl += `&station_id=${encodeURIComponent(advCurrentStation)}`;
+            }
+
+            Promise.all([
+                fetch(classifyUrl).then(r => r.json()).catch(err => ({ classifications: [], summary: {} })),
+                fetch(driftUrl).then(r => r.json()).catch(err => ({ channels: [], overall_drift_status: "UNKNOWN" })),
+                fetch(readingsUrl).then(r => r.json()).catch(err => ([]))
+            ])
+            .then(([classData, driftData, readingsData]) => {
+                cachedClassifications = classData.classifications || [];
+                cachedDriftAnalysis = driftData;
+                cachedChartReadings = readingsData || [];
+
+                // Initialize channels dropdown if needed
+                const chSelect = document.getElementById("adv-channel-select");
+                if (chSelect) {
+                    const currentVal = chSelect.value;
+                    const availableChannels = currentSensorColumns.length > 0
+                        ? currentSensorColumns
+                        : (cachedDriftAnalysis.channels ? cachedDriftAnalysis.channels.map(c => c.affected_channel) : []);
+
+                    if (availableChannels.length > 0) {
+                        chSelect.innerHTML = "";
+                        availableChannels.forEach(c => {
+                            const opt = document.createElement("option");
+                            opt.value = c;
+                            opt.textContent = c.replace(/_/g, " ");
+                            if (c === currentVal || (!currentVal && c === "Ambient_Temperature") || (!currentVal && chSelect.children.length === 0)) {
+                                opt.selected = true;
+                            }
+                            chSelect.appendChild(opt);
+                        });
+                        advCurrentChannel = chSelect.value || availableChannels[0];
+                    }
+                }
+
+                // Render components
+                renderClassifiedList();
+                renderDriftCards();
+                renderAdvancedChart();
+            })
+            .catch(err => {
+                console.error("Advanced Analytics load error:", err);
+            });
+        }
+
+        function handleAdvStationChange(stationId) {
+            selectStation(stationId || null);
+        }
+
+        function handleAdvChannelChange(channel) {
+            advCurrentChannel = channel;
+            renderClassifiedList();
+            renderDriftCards();
+            renderAdvancedChart();
+        }
+
+        function filterClassifications(filterType) {
+            advClassificationFilter = filterType;
+            document.querySelectorAll("#advanced-analytics-section .filter-chip").forEach(btn => {
+                btn.classList.remove("active");
+            });
+            if (filterType === "ALL") {
+                const btn = document.getElementById("chip-all");
+                if (btn) btn.classList.add("active");
+            } else if (filterType === "VALID_EXTREME_EVENT") {
+                const btn = document.getElementById("chip-valid");
+                if (btn) btn.classList.add("active");
+            } else if (filterType === "UNRELIABLE_READING") {
+                const btn = document.getElementById("chip-unreliable");
+                if (btn) btn.classList.add("active");
+            }
+            renderClassifiedList();
+        }
+
+        function renderClassifiedList() {
+            const container = document.getElementById("classified-list-container");
+            const summaryText = document.getElementById("classified-summary-text");
+            if (!container) return;
+
+            let items = cachedClassifications || [];
+            if (advCurrentChannel) {
+                const channelMatches = items.filter(x => x.channel === advCurrentChannel);
+                if (channelMatches.length > 0) {
+                    items = channelMatches;
+                }
+            }
+
+            if (advClassificationFilter !== "ALL") {
+                items = items.filter(x => x.classification === advClassificationFilter);
+            }
+
+            if (summaryText) {
+                const validCount = (cachedClassifications || []).filter(x => x.classification === "VALID_EXTREME_EVENT").length;
+                const unreliableCount = (cachedClassifications || []).filter(x => x.classification === "UNRELIABLE_READING").length;
+                summaryText.textContent = `Showing ${items.length} observations • ${validCount} Valid Extreme Events (Orange), ${unreliableCount} Unreliable Readings (Red)`;
+            }
+
+            container.innerHTML = "";
+            if (items.length === 0) {
+                container.innerHTML = `<div style="color: #94a3b8; padding: 24px; text-align: center;">No extreme observations matching current filters.</div>`;
+                return;
+            }
+
+            items.slice(0, 15).forEach(item => {
+                const isValid = item.classification === "VALID_EXTREME_EVENT";
+                const card = document.createElement("div");
+                card.className = `classified-card ${isValid ? 'valid-event' : 'unreliable'}`;
+                card.onclick = () => openFalseAlarmModal(item);
+
+                const pillClass = isValid ? "pill-valid-event" : "pill-unreliable";
+                const statusLabel = isValid ? "VALID EXTREME EVENT" : "UNRELIABLE READING";
+
+                const evProof = isValid
+                    ? (item.evidence && item.evidence.cross_sensor_agreement ? item.evidence.cross_sensor_agreement : "Corroborated by correlated channels")
+                    : (item.evidence && item.evidence.rate_of_change ? item.evidence.rate_of_change : "Uncorroborated single-sensor anomaly");
+
+                card.innerHTML = `
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px;">
+                            <span style="font-weight: 700; color: #f8fafc; font-size: 13px;">${item.channel}</span>
+                            <span style="color: #94a3b8; font-size: 11px;">• ${item.station_id || 'STN'} • ${item.timestamp}</span>
+                        </div>
+                        <div style="font-size: 12px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${evProof}">
+                            ${evProof}
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0;">
+                        <span class="pill ${pillClass}">${statusLabel}</span>
+                        <span style="font-size: 11px; color: #38bdf8; font-weight: 600;">Conf: ${(item.confidence * 100).toFixed(0)}% 🔍</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderDriftCards() {
+            const container = document.getElementById("drift-channels-container");
+            const overallPill = document.getElementById("drift-overall-pill");
+            const chartBadge = document.getElementById("adv-channel-drift-badge");
+            const calloutText = document.getElementById("adv-drift-callout-text");
+            if (!container) return;
+
+            const channels = (cachedDriftAnalysis && cachedDriftAnalysis.channels) ? cachedDriftAnalysis.channels : [];
+            const driftDetectedCount = channels.filter(c => c.drift_status === "DRIFT_DETECTED").length;
+
+            if (overallPill) {
+                if (driftDetectedCount > 0) {
+                    overallPill.className = "pill pill-drift-detected";
+                    overallPill.textContent = `${driftDetectedCount} DRIFT DETECTED`;
+                } else {
+                    overallPill.className = "pill pill-optimal";
+                    overallPill.textContent = "ALL CHANNELS STABLE";
+                }
+            }
+
+            container.innerHTML = "";
+            if (channels.length === 0) {
+                container.innerHTML = `<div style="color: #94a3b8; padding: 20px; text-align: center;">No drift analysis available.</div>`;
+                return;
+            }
+
+            const activeDriftObj = channels.find(c => c.affected_channel === advCurrentChannel);
+            if (activeDriftObj) {
+                if (chartBadge) {
+                    const isD = activeDriftObj.drift_status === "DRIFT_DETECTED";
+                    chartBadge.className = isD ? "pill pill-drift-detected" : "pill pill-no-drift";
+                    chartBadge.textContent = isD ? `DRIFT DETECTED (${(activeDriftObj.confidence * 100).toFixed(0)}% CONF)` : "NO DRIFT (STABLE)";
+                }
+                if (calloutText) {
+                    if (activeDriftObj.drift_status === "DRIFT_DETECTED") {
+                        calloutText.innerHTML = `📍 <strong style="color: #facc15;">Structural Break Detected at ~${activeDriftObj.approximate_start_time}</strong> — ${(activeDriftObj.confidence * 100).toFixed(0)}% confidence • CUSUM & Baseline shift confirmed.`;
+                    } else {
+                        calloutText.innerHTML = `✓ Baseline stationary within normal dispersion limits for <strong style="color: #f8fafc;">${advCurrentChannel}</strong> (zero persistent changepoint).`;
+                    }
+                }
+            }
+
+            channels.forEach(ch => {
+                const isDrifting = ch.drift_status === "DRIFT_DETECTED";
+                const card = document.createElement("div");
+                card.className = `drift-channel-card ${isDrifting ? 'drifting' : 'stable'}`;
+                card.onclick = () => openDriftModal(ch);
+
+                const pillClass = isDrifting ? "pill-drift-detected" : "pill-no-drift";
+                const statusText = isDrifting ? "DRIFT DETECTED" : "NO DRIFT";
+
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                        <div>
+                            <span style="font-weight: 700; color: #f8fafc; font-size: 14px;">${ch.affected_channel}</span>
+                            <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">
+                                ${isDrifting ? `Start Point: <strong style="color: #facc15;">${ch.approximate_start_time}</strong>` : 'Baseline: Stable Calibration'}
+                            </div>
+                        </div>
+                        <span class="pill ${pillClass}">${statusText}</span>
+                    </div>
+                    <div style="font-size: 12px; color: #cbd5e1; line-height: 1.35; margin-bottom: 8px;">
+                        ${ch.evidence ? (ch.evidence.baseline_shift || ch.evidence.rolling_trend) : 'Multi-signal drift analysis'}
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #94a3b8;">
+                        <span>Confidence: <strong style="color: ${isDrifting ? '#facc15' : '#4ade80'};">${(ch.confidence * 100).toFixed(0)}%</strong></span>
+                        <span style="color: #38bdf8; font-weight: 600;">🔍 View Full Statistical Evidence →</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // =========================================================
+        // High-Performance Interactive HTML5 Canvas Chart Renderer
+        // =========================================================
+
+        function renderAdvancedChart() {
+            const canvas = document.getElementById("adv-analytics-canvas");
+            const container = document.getElementById("adv-canvas-container");
+            const chartTitle = document.getElementById("adv-chart-title");
+            if (!canvas || !container) return;
+
+            const channelName = advCurrentChannel || (currentSensorColumns[0] || "Ambient_Temperature");
+            if (chartTitle) {
+                chartTitle.textContent = `${channelName.replace(/_/g, " ")} — Multi-Signal Telemetry & Extreme Events`;
+            }
+
+            const dpr = window.devicePixelRatio || 1;
+            const rect = container.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+
+            const ctx = canvas.getContext("2d");
+            ctx.resetTransform();
+            ctx.scale(dpr, dpr);
+
+            const width = rect.width;
+            const height = rect.height;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Filter readings for current channel
+            const rawPoints = [];
+            (cachedChartReadings || []).forEach(r => {
+                if (r[channelName] !== undefined && r[channelName] !== null) {
+                    rawPoints.push({
+                        timestamp: r.Timestamp || "",
+                        value: Number(r[channelName]),
+                        station: r.Station_ID || "",
+                        readingIndex: r.row_index
+                    });
+                }
+            });
+
+            if (rawPoints.length === 0) {
+                ctx.fillStyle = "#94a3b8";
+                ctx.font = "14px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText(`No telemetry points available for ${channelName}.`, width / 2, height / 2);
+                return;
+            }
+
+            const padLeft = 60;
+            const padRight = 30;
+            const padTop = 30;
+            const padBottom = 40;
+            const plotW = width - padLeft - padRight;
+            const plotH = height - padTop - padBottom;
+
+            let minVal = Math.min(...rawPoints.map(p => p.value));
+            let maxVal = Math.max(...rawPoints.map(p => p.value));
+
+            const channelExtremes = (cachedClassifications || []).filter(c => c.channel === channelName);
+            channelExtremes.forEach(c => {
+                if (c.value !== undefined && c.value !== null) {
+                    minVal = Math.min(minVal, Number(c.value));
+                    maxVal = Math.max(maxVal, Number(c.value));
+                }
+            });
+
+            if (minVal === maxVal) {
+                minVal -= 1;
+                maxVal += 1;
+            }
+            const valSpan = maxVal - minVal;
+            minVal -= valSpan * 0.08;
+            maxVal += valSpan * 0.08;
+
+            function getX(i, total) {
+                return padLeft + (i / Math.max(1, total - 1)) * plotW;
+            }
+            function getY(val) {
+                return padTop + plotH - ((val - minVal) / (maxVal - minVal)) * plotH;
+            }
+
+            // 1. Draw Grid Lines & Y-Ticks
+            ctx.strokeStyle = "#1e293b";
+            ctx.lineWidth = 1;
+            ctx.fillStyle = "#64748b";
+            ctx.font = "11px sans-serif";
+            ctx.textAlign = "right";
+
+            const ySteps = 5;
+            for (let i = 0; i <= ySteps; i++) {
+                const val = minVal + (i / ySteps) * (maxVal - minVal);
+                const y = getY(val);
+
+                ctx.beginPath();
+                ctx.setLineDash([4, 4]);
+                ctx.moveTo(padLeft, y);
+                ctx.lineTo(width - padRight, y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.fillText(val.toFixed(1), padLeft - 10, y + 4);
+            }
+
+            // X-Ticks
+            ctx.textAlign = "center";
+            const xSteps = Math.min(6, rawPoints.length);
+            for (let i = 0; i < xSteps; i++) {
+                const idx = Math.floor((i / (xSteps - 1)) * (rawPoints.length - 1));
+                const p = rawPoints[idx];
+                const x = getX(idx, rawPoints.length);
+                const shortTime = p.timestamp ? p.timestamp.split(" ")[1] || p.timestamp.substring(5, 16) : `#${idx}`;
+                ctx.fillText(shortTime, x, height - padBottom + 18);
+            }
+
+            // 2. Connect Telemetry Line
+            ctx.beginPath();
+            ctx.strokeStyle = "rgba(14, 165, 233, 0.65)";
+            ctx.lineWidth = 1.8;
+            rawPoints.forEach((p, idx) => {
+                const x = getX(idx, rawPoints.length);
+                const y = getY(p.value);
+                if (idx === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            // 3. Draw Normal Telemetry Points & populate hitboxes
+            canvasHitBoxes = [];
+            rawPoints.forEach((p, idx) => {
+                const x = getX(idx, rawPoints.length);
+                const y = getY(p.value);
+
+                ctx.beginPath();
+                ctx.fillStyle = "#38bdf8";
+                ctx.arc(x, y, 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                canvasHitBoxes.push({
+                    x, y,
+                    radius: 8,
+                    timestamp: p.timestamp,
+                    value: p.value,
+                    channel: channelName,
+                    station: p.station,
+                    type: "NORMAL"
+                });
+            });
+
+            // 4. Draw Regression Trend Line
+            if (rawPoints.length >= 2) {
+                const n = rawPoints.length;
+                let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+                rawPoints.forEach((p, i) => {
+                    sumX += i;
+                    sumY += p.value;
+                    sumXY += i * p.value;
+                    sumXX += i * i;
+                });
+                const slope = (n * sumXY - sumX * sumY) / Math.max(1, (n * sumXX - sumX * sumX));
+                const intercept = (sumY - slope * sumX) / n;
+
+                const yStart = getY(intercept);
+                const yEnd = getY(intercept + slope * (n - 1));
+
+                ctx.beginPath();
+                ctx.setLineDash([6, 4]);
+                ctx.strokeStyle = "rgba(56, 189, 248, 0.4)";
+                ctx.lineWidth = 1.5;
+                ctx.moveTo(getX(0, n), yStart);
+                ctx.lineTo(getX(n - 1, n), yEnd);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            // 5. Draw Drift Changepoint Marker if Detected
+            const chDrift = (cachedDriftAnalysis && cachedDriftAnalysis.channels)
+                ? cachedDriftAnalysis.channels.find(c => c.affected_channel === channelName)
+                : null;
+
+            if (chDrift && chDrift.drift_status === "DRIFT_DETECTED" && chDrift.approximate_start_time && chDrift.approximate_start_time !== "N/A") {
+                let cpIdx = -1;
+                const startTimeStr = chDrift.approximate_start_time;
+
+                rawPoints.forEach((p, idx) => {
+                    if (p.timestamp && p.timestamp.startsWith(startTimeStr.substring(0, 10))) {
+                        cpIdx = idx;
+                    }
                 });
 
-            })
-            .catch(error => {
+                const cpX = cpIdx !== -1 ? getX(cpIdx, rawPoints.length) : padLeft + plotW * 0.48;
 
-                document.getElementById("readings").innerHTML =
-                    "<tr><td colspan='5'>Unable to connect to API</td></tr>";
+                ctx.save();
+                ctx.beginPath();
+                ctx.setLineDash([5, 4]);
+                ctx.strokeStyle = "#facc15";
+                ctx.lineWidth = 2;
+                ctx.moveTo(cpX, padTop);
+                ctx.lineTo(cpX, padTop + plotH);
+                ctx.stroke();
+                ctx.setLineDash([]);
 
-                console.error("API Error:", error);
+                ctx.fillStyle = "rgba(250, 204, 21, 0.18)";
+                ctx.strokeStyle = "#facc15";
+                ctx.lineWidth = 1;
+                ctx.fillRect(cpX - 70, padTop - 20, 140, 20);
+                ctx.strokeRect(cpX - 70, padTop - 20, 140, 20);
 
+                ctx.fillStyle = "#facc15";
+                ctx.font = "bold 10px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText(`🚩 DRIFT: ~${startTimeStr.substring(5, 16)}`, cpX, padTop - 6);
+                ctx.restore();
+            }
+
+            // 6. Overlay Classified Extreme Observations (Orange = Valid Event, Red = Unreliable)
+            channelExtremes.forEach(c => {
+                let targetX = null;
+                rawPoints.forEach((p, idx) => {
+                    if (p.timestamp && c.timestamp && p.timestamp.trim() === c.timestamp.trim()) {
+                        targetX = getX(idx, rawPoints.length);
+                    }
+                });
+
+                if (targetX === null) {
+                    const hash = (c.timestamp || "").split("").reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
+                    const pseudoIdx = Math.abs(hash) % rawPoints.length;
+                    targetX = getX(pseudoIdx, rawPoints.length);
+                }
+
+                const targetY = getY(Number(c.value));
+                const isValid = c.classification === "VALID_EXTREME_EVENT";
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = isValid ? "#ea580c" : "#dc2626";
+                ctx.fillStyle = isValid ? "#f97316" : "#ef4444";
+                ctx.arc(targetX, targetY, 6.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.fillStyle = "#ffffff";
+                ctx.arc(targetX, targetY, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+
+                canvasHitBoxes.push({
+                    x: targetX,
+                    y: targetY,
+                    radius: 12,
+                    timestamp: c.timestamp,
+                    value: c.value,
+                    channel: c.channel,
+                    station: c.station_id,
+                    type: c.classification,
+                    confidence: c.confidence,
+                    evidence: c.evidence,
+                    fullItem: c
+                });
+            });
+        }
+
+        // Setup Canvas Mouse Events for Tooltips and Click
+        const advCanvas = document.getElementById("adv-analytics-canvas");
+        if (advCanvas) {
+            advCanvas.addEventListener("mousemove", (e) => {
+                const rect = advCanvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                const tooltip = document.getElementById("adv-chart-tooltip");
+
+                let hovered = null;
+                for (let i = canvasHitBoxes.length - 1; i >= 0; i--) {
+                    const hb = canvasHitBoxes[i];
+                    const dist = Math.hypot(mouseX - hb.x, mouseY - hb.y);
+                    if (dist <= hb.radius) {
+                        hovered = hb;
+                        break;
+                    }
+                }
+
+                if (hovered && tooltip) {
+                    tooltip.style.display = "block";
+                    tooltip.style.left = `${Math.min(rect.width - 220, mouseX + 12)}px`;
+                    tooltip.style.top = `${Math.max(10, mouseY - 45)}px`;
+
+                    if (hovered.type === "VALID_EXTREME_EVENT") {
+                        tooltip.innerHTML = `
+                            <strong style="color: #fb923c;">⚡ VALID EXTREME EVENT</strong><br>
+                            Value: <strong>${formatVal(hovered.value)}</strong> • ${hovered.timestamp}<br>
+                            <span style="color: #4ade80;">Confidence: ${(hovered.confidence * 100).toFixed(0)}%</span> (Click to inspect)
+                        `;
+                    } else if (hovered.type === "UNRELIABLE_READING") {
+                        tooltip.innerHTML = `
+                            <strong style="color: #f87171;">⚠️ UNRELIABLE READING / FAULT</strong><br>
+                            Value: <strong>${formatVal(hovered.value)}</strong> • ${hovered.timestamp}<br>
+                            <span style="color: #f87171;">Confidence: ${(hovered.confidence * 100).toFixed(0)}%</span> (Click to inspect)
+                        `;
+                    } else {
+                        tooltip.innerHTML = `
+                            <span style="color: #94a3b8;">Normal Observation</span><br>
+                            Value: <strong>${formatVal(hovered.value)}</strong> • ${hovered.timestamp}
+                        `;
+                    }
+                } else if (tooltip) {
+                    tooltip.style.display = "none";
+                }
             });
 
-    </script>
+            advCanvas.addEventListener("mouseleave", () => {
+                const tooltip = document.getElementById("adv-chart-tooltip");
+                if (tooltip) tooltip.style.display = "none";
+            });
 
+            advCanvas.addEventListener("click", (e) => {
+                const rect = advCanvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                for (let i = canvasHitBoxes.length - 1; i >= 0; i--) {
+                    const hb = canvasHitBoxes[i];
+                    const dist = Math.hypot(mouseX - hb.x, mouseY - hb.y);
+                    if (dist <= hb.radius && hb.fullItem) {
+                        openFalseAlarmModal(hb.fullItem);
+                        break;
+                    }
+                }
+            });
+        }
+
+        window.addEventListener("resize", () => {
+            renderAdvancedChart();
+        });
+
+        // =========================================================
+        // Unified Evidence Breakdown Modal Controllers
+        // =========================================================
+
+        function openFalseAlarmModal(item) {
+            const modal = document.getElementById("trust-modal-overlay");
+            const modalBody = document.getElementById("modal-body");
+            const modalTitle = document.getElementById("modal-title");
+            const modalSubtitle = document.getElementById("modal-subtitle");
+
+            const isValid = item.classification === "VALID_EXTREME_EVENT";
+            const pillClass = isValid ? "pill-valid-event" : "pill-unreliable";
+            const labelText = isValid ? "VALID EXTREME EVENT" : "UNRELIABLE READING";
+
+            modalTitle.textContent = isValid ? "🔥 Valid Extreme Event Analysis" : "🚨 Unreliable Reading / False Alarm";
+            modalSubtitle.textContent = `Station: ${item.station_id || 'STN'} • Channel: ${item.channel} • Timestamp: ${item.timestamp}`;
+
+            const ev = item.evidence || {};
+
+            modalBody.innerHTML = `
+                <div class="score-summary-card" style="${isValid ? 'border-color: #f97316;' : 'border-color: #ef4444;'}">
+                    <div class="score-metric">
+                        <div class="score-metric-label">Classification</div>
+                        <div><span class="pill ${pillClass}">${labelText}</span></div>
+                    </div>
+                    <div class="score-metric">
+                        <div class="score-metric-label">Decision Confidence</div>
+                        <div class="score-metric-val" style="color: ${isValid ? '#fb923c' : '#f87171'};">
+                            ${(item.confidence * 100).toFixed(0)}%
+                        </div>
+                    </div>
+                    <div class="score-metric">
+                        <div class="score-metric-label">Observed Value</div>
+                        <div class="score-metric-val" style="color: #f8fafc;">${formatVal(item.value)}</div>
+                    </div>
+                </div>
+
+                <h4 style="font-size: 12px; text-transform: uppercase; color: #94a3b8; margin-bottom: 12px; letter-spacing: 0.5px;">
+                    Multi-Signal Evidence Breakdown (4 Independent Sources)
+                </h4>
+
+                <div class="evidence-card-modal" style="border-left: 4px solid #38bdf8;">
+                    <div class="ev-label">🤝 1. Cross-Sensor Agreement</div>
+                    <div class="ev-text">${ev.cross_sensor_agreement || 'No cross-sensor agreement evidence recorded.'}</div>
+                </div>
+
+                <div class="evidence-card-modal" style="border-left: 4px solid #4ade80;">
+                    <div class="ev-label">⏱️ 2. Temporal Persistence</div>
+                    <div class="ev-text">${ev.persistence || 'No temporal persistence evidence recorded.'}</div>
+                </div>
+
+                <div class="evidence-card-modal" style="border-left: 4px solid #facc15;">
+                    <div class="ev-label">⚡ 3. Rate of Change Context</div>
+                    <div class="ev-text">${ev.rate_of_change || 'No rate of change evidence recorded.'}</div>
+                </div>
+
+                <div class="evidence-card-modal" style="border-left: 4px solid #c084fc;">
+                    <div class="ev-label">📊 4. Local Robust Statistics (Median / MAD)</div>
+                    <div class="ev-text">${ev.local_statistics || 'No local statistics evidence recorded.'}</div>
+                </div>
+
+                <div style="margin-top: 14px; font-size: 11px; color: #64748b; text-align: right;">
+                    Decision rule combines multi-channel corroboration, temporal continuity, and local dispersion — no single global threshold.
+                </div>
+            `;
+
+            modal.style.display = "flex";
+        }
+
+        function openDriftModal(driftItem) {
+            const modal = document.getElementById("trust-modal-overlay");
+            const modalBody = document.getElementById("modal-body");
+            const modalTitle = document.getElementById("modal-title");
+            const modalSubtitle = document.getElementById("modal-subtitle");
+
+            const isDrifting = driftItem.drift_status === "DRIFT_DETECTED";
+            const pillClass = isDrifting ? "pill-drift-detected" : "pill-no-drift";
+            const labelText = isDrifting ? "DRIFT DETECTED" : "NO DRIFT (STABLE)";
+
+            modalTitle.textContent = `📈 Measurement Drift Analysis: ${driftItem.affected_channel}`;
+            modalSubtitle.textContent = `Channel: ${driftItem.affected_channel} • Scope: ${driftItem.station_id || 'All Stations'}`;
+
+            const ev = driftItem.evidence || {};
+
+            modalBody.innerHTML = `
+                <div class="score-summary-card" style="${isDrifting ? 'border-color: #facc15;' : 'border-color: #4ade80;'}">
+                    <div class="score-metric">
+                        <div class="score-metric-label">Drift Status</div>
+                        <div><span class="pill ${pillClass}">${labelText}</span></div>
+                    </div>
+                    <div class="score-metric">
+                        <div class="score-metric-label">Drift Confidence</div>
+                        <div class="score-metric-val" style="color: ${isDrifting ? '#facc15' : '#4ade80'};">
+                            ${(driftItem.confidence * 100).toFixed(0)}%
+                        </div>
+                    </div>
+                    <div class="score-metric">
+                        <div class="score-metric-label">Approximate Start Time</div>
+                        <div style="font-size: 14px; font-weight: 700; color: #f8fafc; margin-top: 4px;">
+                            ${driftItem.approximate_start_time || 'N/A'}
+                        </div>
+                    </div>
+                </div>
+
+                <h4 style="font-size: 12px; text-transform: uppercase; color: #94a3b8; margin-bottom: 12px; letter-spacing: 0.5px;">
+                    Multi-Signal Drift Evidence (5 Dimensional Verification)
+                </h4>
+
+                <div class="evidence-card-modal" style="border-left: 4px solid #38bdf8;">
+                    <div class="ev-label">📈 1. Rolling Trend Analysis & Slope</div>
+                    <div class="ev-text">${ev.rolling_trend || 'Trend slope data not available.'}</div>
+                </div>
+
+                <div class="evidence-card-modal" style="border-left: 4px solid #4ade80;">
+                    <div class="ev-label">⚖️ 2. Baseline Window Shift Comparison</div>
+                    <div class="ev-text">${ev.baseline_shift || 'Baseline comparison data not available.'}</div>
+                </div>
+
+                <div class="evidence-card-modal" style="border-left: 4px solid #facc15;">
+                    <div class="ev-label">🎯 3. Change-Point Detection (CUSUM & Structural Break)</div>
+                    <div class="ev-text">${ev.change_point || 'Change-point data not available.'}</div>
+                </div>
+
+                <div class="evidence-card-modal" style="border-left: 4px solid #f472b6;">
+                    <div class="ev-label">🌐 4. Cross-Sensor Environmental vs Hardware Isolation</div>
+                    <div class="ev-text">${ev.cross_sensor_evidence || 'Cross-sensor isolation data not available.'}</div>
+                </div>
+
+                <div class="evidence-card-modal" style="border-left: 4px solid #c084fc;">
+                    <div class="ev-label">⏳ 5. Post-Transition Persistence & Streak</div>
+                    <div class="ev-text">${ev.persistence || 'Persistence data not available.'}</div>
+                </div>
+
+                <div style="margin-top: 14px; font-size: 11px; color: #64748b; text-align: right;">
+                    Statistical evidence verified via robust CUSUM, normalized slope, and dynamic cross-sensor correlation matrix.
+                </div>
+            `;
+
+            modal.style.display = "flex";
+        }
+
+        // Initial Load
+        loadSummary();
+        loadStations();
+        loadAlerts();
+        loadDrift();
+        loadReadings();
+        loadAdvancedAnalytics();
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            loadSummary();
+            loadAlerts();
+        }, 30000);
+    </script>
 </body>
 </html>
